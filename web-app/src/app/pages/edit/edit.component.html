@@ -1,0 +1,139 @@
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Edit Video Game Catalogue</h1>
+    <a routerLink="/browse" class="btn btn-secondary">
+      Back to Browse
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Genre</th>
+          <th>Platform</th>
+          <th>Year</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (game of videoGames; track game.id) {
+          <tr>
+            <td>{{ game.id }}</td>
+            <td>{{ game.title }}</td>
+            <td>{{ game.genre }}</td>
+            <td>{{ game.platform }}</td>
+            <td>{{ game.releaseYear }}</td>
+            <td>\${{ game.price.toFixed(2) }}</td>
+            <td>
+              <button
+                class="btn btn-sm btn-primary me-2"
+                (click)="openEditModal(editModal, game)">
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteGame(game.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (videoGames.length === 0) {
+    <div class="alert alert-info text-center">
+      No video games in the catalogue. Add some games to get started!
+    </div>
+  }
+</div>
+
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Video Game</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    @if (selectedGame) {
+      <form>
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            [(ngModel)]="selectedGame.title"
+            name="title">
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="genre" class="form-label">Genre</label>
+            <input
+              type="text"
+              class="form-control"
+              id="genre"
+              [(ngModel)]="selectedGame.genre"
+              name="genre">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="platform" class="form-label">Platform</label>
+            <input
+              type="text"
+              class="form-control"
+              id="platform"
+              [(ngModel)]="selectedGame.platform"
+              name="platform">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="releaseYear" class="form-label">Release Year</label>
+            <input
+              type="number"
+              class="form-control"
+              id="releaseYear"
+              [(ngModel)]="selectedGame.releaseYear"
+              name="releaseYear">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="price" class="form-label">Price ($)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="price"
+              [(ngModel)]="selectedGame.price"
+              name="price"
+              step="0.01">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            rows="3"
+            [(ngModel)]="selectedGame.description"
+            name="description"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="imageUrl" class="form-label">Image URL</label>
+          <input
+            type="text"
+            class="form-control"
+            id="imageUrl"
+            [(ngModel)]="selectedGame.imageUrl"
+            name="imageUrl">
+        </div>
+      </form>
+    }
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveChanges(modal)">Save Changes</button>
+  </div>
+</ng-template>
