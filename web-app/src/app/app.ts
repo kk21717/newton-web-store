@@ -10,5 +10,5 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './app.css'
 })
 export class App {
-  title = 'Video Game Catalogue';
+  title = 'Newton Game Store';
 }
