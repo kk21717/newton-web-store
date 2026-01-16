@@ -7,21 +7,21 @@
     <button
       class="navbar-toggler"
       type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
+      (click)="isMenuCollapsed = !isMenuCollapsed"
+      [attr.aria-expanded]="!isMenuCollapsed"
       aria-controls="navbarNav"
-      aria-expanded="false"
       aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="navbar-collapse" [ngbCollapse]="isMenuCollapsed" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <a
             class="nav-link"
             routerLink="/browse"
             routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }">
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="isMenuCollapsed = true">
             Browse
           </a>
         </li>
@@ -29,7 +29,8 @@
           <a
             class="nav-link"
             routerLink="/edit"
-            routerLinkActive="active">
+            routerLinkActive="active"
+            (click)="isMenuCollapsed = true">
             Edit
           </a>
         </li>

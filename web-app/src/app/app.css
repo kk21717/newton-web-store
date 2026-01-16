@@ -1,0 +1,6 @@
+.navbar-nav .nav-link.active {
+/*  background-color: white;
+  color: #212529 !important;*/
+  cursor: default;
+  border-radius: 4px;
+}

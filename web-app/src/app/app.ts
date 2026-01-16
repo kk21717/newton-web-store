@@ -10,5 +10,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './app.css'
 })
 export class App {
-  title = 'Newton Game Store';
+  title = 'Game Store';
+  isMenuCollapsed = true;
 }
