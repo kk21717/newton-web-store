@@ -31,11 +31,41 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return await DbSet.ToListAsync(cancellationToken);
     }
 
+    public virtual async Task<PagedResult<T>> GetAllPagedAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var totalCount = await DbSet.CountAsync(cancellationToken);
+        var items = await DbSet
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<T>(items, totalCount, pageNumber, pageSize);
+    }
+
     public virtual async Task<IEnumerable<T>> FindAsync(
         Expression<Func<T, bool>> predicate,
         CancellationToken cancellationToken = default)
     {
         return await DbSet.Where(predicate).ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<PagedResult<T>> FindPagedAsync(
+        Expression<Func<T, bool>> predicate,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbSet.Where(predicate);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<T>(items, totalCount, pageNumber, pageSize);
     }
 
     public virtual async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
@@ -70,5 +100,12 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
         return await DbSet.CountAsync(cancellationToken);
+    }
+
+    public virtual async Task<int> CountAsync(
+        Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.CountAsync(predicate, cancellationToken);
     }
 }

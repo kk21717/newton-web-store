@@ -1,80 +1,220 @@
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Edit Catalogue</h1>
-    <a routerLink="/browse" class="btn btn-secondary">
-      Back to Browse
-    </a>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success" (click)="openAddModal(editModal)">
+        <i class="bi bi-plus-lg"></i> Add New
+      </button>
+      <a routerLink="/browse" class="btn btn-secondary">
+        Back to Browse
+      </a>
+    </div>
+  </div>
+
+  <!-- Search and Filter Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label for="searchType" class="form-label">Search By</label>
+          <select id="searchType"
+                  class="form-select"
+                  [(ngModel)]="searchType"
+                  [disabled]="loading">
+            <option value="all">All (Title Search)</option>
+            <option value="title">Title</option>
+            <option value="genre">Genre</option>
+            <option value="platform">Platform</option>
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label for="searchTerm" class="form-label">Search Term</label>
+          <input type="text"
+                 id="searchTerm"
+                 class="form-control"
+                 [(ngModel)]="searchTerm"
+                 [placeholder]="searchType === 'genre' ? 'e.g., Action, RPG' : searchType === 'platform' ? 'e.g., PC, PlayStation' : 'Enter search term...'"
+                 [disabled]="loading"
+                 (keyup.enter)="onSearch()">
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary flex-grow-1"
+                    (click)="onSearch()"
+                    [disabled]="loading">
+              <i class="bi bi-search"></i> Search
+            </button>
+            <button class="btn btn-outline-secondary"
+                    (click)="onClearSearch()"
+                    [disabled]="loading"
+                    title="Clear search">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   @if (loading) {
-    <div class="d-flex justify-content-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+  <div class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+  </div>
   }
 
   @if (error) {
-    <div class="alert alert-danger" role="alert">
-      {{ error }}
-      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadVideoGames()">
-        Retry
-      </button>
-    </div>
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadVideoGames()">
+      Retry
+    </button>
+  </div>
   }
 
   @if (!loading && !error) {
-    @if (videoGames.length === 0) {
-      <div class="alert alert-info text-center">
-        No video games in the catalogue. Add some games to get started!
-      </div>
+
+  @if (videoGames.length === 0) {
+  <div class="alert alert-info text-center">
+    @if (searchTerm) {
+    No video games found matching your search criteria.
     } @else {
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Genre</th>
-              <th>Platform</th>
-              <th>Year</th>
-              <th>Price</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (game of videoGames; track game.id) {
-              <tr>
-                <td>{{ game.id }}</td>
-                <td>{{ game.title }}</td>
-                <td>{{ game.genre }}</td>
-                <td>{{ game.platform }}</td>
-                <td>{{ game.releaseYear }}</td>
-                <td>${{ game.price.toFixed(2) }}</td>
-                <td>
-                  <button
-                    class="btn btn-sm btn-primary me-2"
-                    (click)="openEditModal(editModal, game)">
-                    Edit
-                  </button>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    (click)="deleteGame(game.id)">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+    No video games in the catalogue. Add some games to get started!
     }
+  </div>
+  } @else {
+  <!-- Results info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted">
+      Showing {{ videoGames.length }} of {{ totalCount }} results
+      @if (searchTerm) {
+      <span class="badge bg-secondary ms-2">
+        {{ searchType === 'all' ? 'Search' : searchType }}: "{{ searchTerm }}"
+      </span>
+      }
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Genre</th>
+          <th>Platform</th>
+          <th>Year</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (game of videoGames; track game.id) {
+        <tr>
+          <td>{{ game.id }}</td>
+          <td>{{ game.title }}</td>
+          <td>{{ game.genre }}</td>
+          <td>{{ game.platform }}</td>
+          <td>{{ game.releaseYear }}</td>
+          <td>${{ game.price.toFixed(2) }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-2"
+                    (click)="openEditModal(editModal, game)">
+              Edit
+            </button>
+            <button class="btn btn-sm btn-danger"
+                    (click)="deleteGame(game.id)">
+              Delete
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  @if (totalPages >= 1) {
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <!-- Results info -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      @if (totalPages > 0) {
+      <div class="text-muted">
+        Page {{ pageNumber }} of {{ totalPages }}
+      </div>
+      }
+    </div>
+    <nav aria-label="Video games pagination">
+      <ul class="pagination mb-0">
+        <li class="page-item" [class.disabled]="!hasPreviousPage">
+          <button class="page-link"
+                  (click)="onPageChange(1)"
+                  [disabled]="!hasPreviousPage"
+                  aria-label="First page">
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+        </li>
+        <li class="page-item" [class.disabled]="!hasPreviousPage">
+          <button class="page-link"
+                  (click)="onPageChange(pageNumber - 1)"
+                  [disabled]="!hasPreviousPage"
+                  aria-label="Previous page">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+        @for (page of getPageNumbers(); track page) {
+        <li class="page-item" [class.active]="page === pageNumber">
+          @if (page === pageNumber) {
+          <span class="page-link" style="cursor: default;">{{ page }}</span>
+          } @else {
+          <button class="page-link"
+                  (click)="onPageChange(page)">
+            {{ page }}
+          </button>
+          }
+        </li>
+        }
+        <li class="page-item" [class.disabled]="!hasNextPage">
+          <button class="page-link"
+                  (click)="onPageChange(pageNumber + 1)"
+                  [disabled]="!hasNextPage"
+                  aria-label="Next page">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+        <li class="page-item" [class.disabled]="!hasNextPage">
+          <button class="page-link"
+                  (click)="onPageChange(totalPages)"
+                  [disabled]="!hasNextPage"
+                  aria-label="Last page">
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+    <div class="d-flex align-items-center gap-2">
+      <label for="pageSize" class="form-label mb-0 text-muted">Page Size:</label>
+      <select id="pageSize"
+              class="form-select form-select-sm"
+              style="width: auto;"
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              [disabled]="loading">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+    </div>
+  </div>
+  }
+  }
   }
 </div>
 
 <ng-template #editModal let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">Edit Video Game</h5>
+    <h5 class="modal-title">{{ isEditMode ? 'Edit Video Game' : 'Add New Video Game' }}</h5>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()" [disabled]="saving"></button>
   </div>
   <div class="modal-body">
@@ -163,9 +303,9 @@
     <button type="button" class="btn btn-primary" (click)="saveChanges(modal)" [disabled]="saving">
       @if (saving) {
         <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-        Saving...
+        {{ isEditMode ? 'Saving...' : 'Creating...' }}
       } @else {
-        Save Changes
+        {{ isEditMode ? 'Save Changes' : 'Create Game' }}
       }
     </button>
   </div>

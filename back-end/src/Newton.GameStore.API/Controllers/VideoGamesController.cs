@@ -23,13 +23,27 @@ public class VideoGamesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all video games in the catalogue.
+    /// Gets all video games in the catalogue with optional pagination.
     /// </summary>
+    /// <param name="pageNumber">Page number (1-based). If not provided, returns all results.</param>
+    /// <param name="pageSize">Number of items per page. Default is 10.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<VideoGameDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VideoGameDto>>> GetAll(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PagedResultDto<VideoGameDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int? pageNumber,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Getting all video games");
+        _logger.LogInformation("Getting all video games (page: {PageNumber}, size: {PageSize})", pageNumber, pageSize);
+
+        if (pageNumber.HasValue)
+        {
+            var pagedResult = await _videoGameService.GetAllPagedAsync(pageNumber.Value, pageSize, cancellationToken);
+            return Ok(pagedResult);
+        }
+
         var games = await _videoGameService.GetAllAsync(cancellationToken);
         return Ok(games);
     }
@@ -55,43 +69,85 @@ public class VideoGamesController : ControllerBase
     }
 
     /// <summary>
-    /// Searches video games by title.
+    /// Searches video games by title with optional pagination.
     /// </summary>
+    /// <param name="term">Search term.</param>
+    /// <param name="pageNumber">Page number (1-based). If not provided, returns all results.</param>
+    /// <param name="pageSize">Number of items per page. Default is 10.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     [HttpGet("search")]
     [ProducesResponseType(typeof(IEnumerable<VideoGameDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VideoGameDto>>> Search(
+    [ProducesResponseType(typeof(PagedResultDto<VideoGameDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Search(
         [FromQuery] string? term,
-        CancellationToken cancellationToken)
+        [FromQuery] int? pageNumber,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Searching video games with term: {Term}", term);
+        _logger.LogInformation("Searching video games with term: {Term} (page: {PageNumber}, size: {PageSize})", term, pageNumber, pageSize);
+
+        if (pageNumber.HasValue)
+        {
+            var pagedResult = await _videoGameService.SearchPagedAsync(term ?? string.Empty, pageNumber.Value, pageSize, cancellationToken);
+            return Ok(pagedResult);
+        }
+
         var games = await _videoGameService.SearchAsync(term ?? string.Empty, cancellationToken);
         return Ok(games);
     }
 
     /// <summary>
-    /// Gets video games by genre.
+    /// Gets video games by genre with optional pagination.
     /// </summary>
+    /// <param name="genre">Genre to filter by.</param>
+    /// <param name="pageNumber">Page number (1-based). If not provided, returns all results.</param>
+    /// <param name="pageSize">Number of items per page. Default is 10.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     [HttpGet("genre/{genre}")]
     [ProducesResponseType(typeof(IEnumerable<VideoGameDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VideoGameDto>>> GetByGenre(
+    [ProducesResponseType(typeof(PagedResultDto<VideoGameDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByGenre(
         string genre,
-        CancellationToken cancellationToken)
+        [FromQuery] int? pageNumber,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Getting video games by genre: {Genre}", genre);
+        _logger.LogInformation("Getting video games by genre: {Genre} (page: {PageNumber}, size: {PageSize})", genre, pageNumber, pageSize);
+
+        if (pageNumber.HasValue)
+        {
+            var pagedResult = await _videoGameService.GetByGenrePagedAsync(genre, pageNumber.Value, pageSize, cancellationToken);
+            return Ok(pagedResult);
+        }
+
         var games = await _videoGameService.GetByGenreAsync(genre, cancellationToken);
         return Ok(games);
     }
 
     /// <summary>
-    /// Gets video games by platform.
+    /// Gets video games by platform with optional pagination.
     /// </summary>
+    /// <param name="platform">Platform to filter by.</param>
+    /// <param name="pageNumber">Page number (1-based). If not provided, returns all results.</param>
+    /// <param name="pageSize">Number of items per page. Default is 10.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     [HttpGet("platform/{platform}")]
     [ProducesResponseType(typeof(IEnumerable<VideoGameDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VideoGameDto>>> GetByPlatform(
+    [ProducesResponseType(typeof(PagedResultDto<VideoGameDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByPlatform(
         string platform,
-        CancellationToken cancellationToken)
+        [FromQuery] int? pageNumber,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Getting video games by platform: {Platform}", platform);
+        _logger.LogInformation("Getting video games by platform: {Platform} (page: {PageNumber}, size: {PageSize})", platform, pageNumber, pageSize);
+
+        if (pageNumber.HasValue)
+        {
+            var pagedResult = await _videoGameService.GetByPlatformPagedAsync(platform, pageNumber.Value, pageSize, cancellationToken);
+            return Ok(pagedResult);
+        }
+
         var games = await _videoGameService.GetByPlatformAsync(platform, cancellationToken);
         return Ok(games);
     }

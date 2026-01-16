@@ -31,6 +31,12 @@ public class VideoGameService : IVideoGameService
         return VideoGameMapper.ToDtoList(entities);
     }
 
+    public async Task<PagedResultDto<VideoGameDto>> GetAllPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var pagedResult = await _unitOfWork.VideoGames.GetAllPagedAsync(pageNumber, pageSize, cancellationToken);
+        return VideoGameMapper.ToPagedDto(pagedResult);
+    }
+
     public async Task<IEnumerable<VideoGameDto>> GetByGenreAsync(string genre, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(genre))
@@ -38,6 +44,15 @@ public class VideoGameService : IVideoGameService
 
         var entities = await _unitOfWork.VideoGames.GetByGenreAsync(genre, cancellationToken);
         return VideoGameMapper.ToDtoList(entities);
+    }
+
+    public async Task<PagedResultDto<VideoGameDto>> GetByGenrePagedAsync(string genre, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(genre))
+            throw new DomainValidationException("Genre cannot be empty.");
+
+        var pagedResult = await _unitOfWork.VideoGames.GetByGenrePagedAsync(genre, pageNumber, pageSize, cancellationToken);
+        return VideoGameMapper.ToPagedDto(pagedResult);
     }
 
     public async Task<IEnumerable<VideoGameDto>> GetByPlatformAsync(string platform, CancellationToken cancellationToken = default)
@@ -49,6 +64,15 @@ public class VideoGameService : IVideoGameService
         return VideoGameMapper.ToDtoList(entities);
     }
 
+    public async Task<PagedResultDto<VideoGameDto>> GetByPlatformPagedAsync(string platform, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(platform))
+            throw new DomainValidationException("Platform cannot be empty.");
+
+        var pagedResult = await _unitOfWork.VideoGames.GetByPlatformPagedAsync(platform, pageNumber, pageSize, cancellationToken);
+        return VideoGameMapper.ToPagedDto(pagedResult);
+    }
+
     public async Task<IEnumerable<VideoGameDto>> SearchAsync(string searchTerm, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
@@ -56,6 +80,15 @@ public class VideoGameService : IVideoGameService
 
         var entities = await _unitOfWork.VideoGames.SearchByTitleAsync(searchTerm, cancellationToken);
         return VideoGameMapper.ToDtoList(entities);
+    }
+
+    public async Task<PagedResultDto<VideoGameDto>> SearchPagedAsync(string searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return await GetAllPagedAsync(pageNumber, pageSize, cancellationToken);
+
+        var pagedResult = await _unitOfWork.VideoGames.SearchByTitlePagedAsync(searchTerm, pageNumber, pageSize, cancellationToken);
+        return VideoGameMapper.ToPagedDto(pagedResult);
     }
 
     public async Task<VideoGameDto> CreateAsync(CreateVideoGameRequest request, CancellationToken cancellationToken = default)

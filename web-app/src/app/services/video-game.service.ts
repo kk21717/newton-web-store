@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { VideoGame, CreateVideoGameRequest, UpdateVideoGameRequest } from '../models/video-game.model';
+import { VideoGame, CreateVideoGameRequest, UpdateVideoGameRequest, PagedResult } from '../models/video-game.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,13 @@ export class VideoGameService {
     return this.http.get<VideoGame[]>(this.apiUrl);
   }
 
+  getAllPaged(pageNumber: number, pageSize: number): Observable<PagedResult<VideoGame>> {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<PagedResult<VideoGame>>(this.apiUrl, { params });
+  }
+
   getById(id: number): Observable<VideoGame> {
     return this.http.get<VideoGame>(`${this.apiUrl}/${id}`);
   }
@@ -25,12 +32,34 @@ export class VideoGameService {
     });
   }
 
+  searchPaged(term: string, pageNumber: number, pageSize: number): Observable<PagedResult<VideoGame>> {
+    const params = new HttpParams()
+      .set('term', term)
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<PagedResult<VideoGame>>(`${this.apiUrl}/search`, { params });
+  }
+
   getByGenre(genre: string): Observable<VideoGame[]> {
     return this.http.get<VideoGame[]>(`${this.apiUrl}/genre/${encodeURIComponent(genre)}`);
   }
 
+  getByGenrePaged(genre: string, pageNumber: number, pageSize: number): Observable<PagedResult<VideoGame>> {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<PagedResult<VideoGame>>(`${this.apiUrl}/genre/${encodeURIComponent(genre)}`, { params });
+  }
+
   getByPlatform(platform: string): Observable<VideoGame[]> {
     return this.http.get<VideoGame[]>(`${this.apiUrl}/platform/${encodeURIComponent(platform)}`);
+  }
+
+  getByPlatformPaged(platform: string, pageNumber: number, pageSize: number): Observable<PagedResult<VideoGame>> {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<PagedResult<VideoGame>>(`${this.apiUrl}/platform/${encodeURIComponent(platform)}`, { params });
   }
 
   create(request: CreateVideoGameRequest): Observable<VideoGame> {

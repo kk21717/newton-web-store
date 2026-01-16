@@ -1,4 +1,5 @@
 using Newton.GameStore.Application.DTOs;
+using Newton.GameStore.Domain.Common;
 using Newton.GameStore.Domain.Entities;
 
 namespace Newton.GameStore.Application.Mapping;
@@ -31,6 +32,22 @@ public static class VideoGameMapper
     public static IEnumerable<VideoGameDto> ToDtoList(IEnumerable<VideoGame> entities)
     {
         return entities.Select(ToDto);
+    }
+
+    public static PagedResultDto<VideoGameDto> ToPagedDto(PagedResult<VideoGame> pagedResult)
+    {
+        ArgumentNullException.ThrowIfNull(pagedResult);
+
+        return new PagedResultDto<VideoGameDto>
+        {
+            Items = pagedResult.Items.Select(ToDto).ToList(),
+            PageNumber = pagedResult.PageNumber,
+            PageSize = pagedResult.PageSize,
+            TotalCount = pagedResult.TotalCount,
+            TotalPages = pagedResult.TotalPages,
+            HasPreviousPage = pagedResult.HasPreviousPage,
+            HasNextPage = pagedResult.HasNextPage
+        };
     }
 
     public static VideoGame ToEntity(CreateVideoGameRequest request)
